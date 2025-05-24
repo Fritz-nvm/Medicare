@@ -1,7 +1,10 @@
 from django.urls import path, include
-from . import views
+from .views import SignUpView, homepage
+
+app_name='core_app'
 
 urlpatterns = [
-    path('home', views.home, name ='home' )
+    path('', homepage, name='homepage'),
+    path('signup/', SignUpView.as_view(), name ='signup' )
    
 ]

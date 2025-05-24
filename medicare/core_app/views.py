@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView, TemplateView
@@ -9,9 +8,8 @@ from .models import User
 
 
 # Create your views here.
-
-def home(request):
-    return render(request, 'home.html')
+def homepage(request):
+    return render(request, 'homepage.html')
 
 class SignUpView(TemplateView):
     template_name = "registration/signup.html"
