@@ -1,0 +1,9 @@
+{% extends "auth_base.html" %}
+
+{% block title %}Logged Out - Medicare{% endblock %}
+
+{% block content %}
+  <h2>Logged Out</h2>
+  <p>You have been successfully logged out.</p>
+  <p><a href="{% url 'login' %}">Log back in</a></p>
+{% endblock %}

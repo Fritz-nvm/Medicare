@@ -1,0 +1,11 @@
+{% extends "auth_base.html" %}
+
+{% block title %}Registration {% endblock %}
+
+{% block content %}
+  <h2>Sign Up</h2>
+  <p>Are you a patient or a specialist?</p>
+  <a href="{% url 'patient_signup' %}" style="margin-right: 10px;"><button>I am a Patient</button></a>
+  <a href="{% url 'specialist_signup' %}"><button>I am a Specialist</button></a>
+{% endblock %}
+
