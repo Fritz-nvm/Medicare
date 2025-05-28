@@ -1,11 +1,20 @@
-{% extends "auth_base.html" %}
+{% extends "registration\base_auth.html" %}
 
 {% block title %}Registration {% endblock %}
 
 {% block content %}
-  <h2>Sign Up</h2>
-  <p>Are you a patient or a specialist?</p>
-  <a href="{% url 'patient_signup' %}" style="margin-right: 10px;"><button>I am a Patient</button></a>
-  <a href="{% url 'specialist_signup' %}"><button>I am a Specialist</button></a>
+<div class="title">Are you a patient or a specialist?</div>
+<div class="content">
+  <div class="button" id="signup_btn">
+    <!-- <input type="submit" value="Login"> -->
+    <a type="submit" href="{% url 'core_app:patient_signup' %}"><button>I am a Patient</button></a>
+  </div>
+
+  <div class="button" id="signup_btn">
+    <!-- <input type="submit" value="Login"> -->
+    <a type="submit" href="{% url 'core_app:specialist_signup' %}"><button>I am a Specialist</button></a>
+  </div>
+</div>
+
 {% endblock %}
 

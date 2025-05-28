@@ -1,37 +1,51 @@
-# core/models.py
 
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.conf import settings
 
-class User(AbstractUser):
-    """Custom User model inheriting from AbstractUser."""
-    is_patient = models.BooleanField("Patient status", default=False)
-    is_specialist = models.BooleanField("Specialist status", default=False)
-    # Add other common fields if needed, e.g., email = models.EmailField(unique=True)
-    # Ensure email is unique if used for login
+class UserManager(BaseUserManager):
+    def _create_user(self, email, password=None, **extra_fields):
+        if not email:
+            raise ValueError('The Email must be set')
+        email = self.normalize_email(email)
+        user = self.model(email=email, **extra_fields)
+        user.set_password(password)
+        user.save(using=self._db)
+        return user
 
-    # Add related_name to avoid clashes with default User model
-    groups = models.ManyToManyField(
-        'auth.Group',
-        verbose_name='groups',
-        blank=True,
-        help_text='The groups this user belongs to. A user will get all permissions granted to each of their groups.',
-        related_name="custom_user_set", # Changed related_name
-        related_query_name="user",
-    )
-    user_permissions = models.ManyToManyField(
-        'auth.Permission',
-        verbose_name='user permissions',
-        blank=True,
-        help_text='Specific permissions for this user.',
-        related_name="custom_user_set", # Changed related_name
-        related_query_name="user",
-    )
+    def create_user(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', False)
+        extra_fields.setdefault('is_superuser', False)
+        return self._create_user(email, password, **extra_fields)
+
+    def create_superuser(self, email, password=None, **extra_fields):
+        extra_fields.setdefault('is_staff', True)
+        extra_fields.setdefault('is_superuser', True)
+        extra_fields.setdefault('is_patient', False)
+        extra_fields.setdefault('is_specialist', False)
+
+        if extra_fields.get('is_staff') is not True:
+            raise ValueError('Superuser must have is_staff=True.')
+        if extra_fields.get('is_superuser') is not True:
+            raise ValueError('Superuser must have is_superuser=True.')
+
+        return self._create_user(email, password, **extra_fields)
+class User(AbstractUser):
+    username = None  # Completely remove username field
+    email = models.EmailField('email address', unique=True)
+    phone_number = models.CharField(max_length=10)
+    is_patient = models.BooleanField(default=False)
+    is_specialist = models.BooleanField(default=False)
+
+    USERNAME_FIELD = 'email'
+    REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number']
+
+    objects = UserManager()
 
     def __str__(self):
-        return self.username
+        return self.email
 
+    # Remove the save() method override that sets username
 class Specialty(models.Model):
     """Model representing a medical specialty."""
     name = models.CharField(max_length=100, unique=True)

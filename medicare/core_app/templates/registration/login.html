@@ -1,4 +1,4 @@
-{% extends 'auth_base.html' % }
+{% extends "registration\base_auth.html" %}
 {% load static %}
 {% block title %}Registration-Login {% endblock title %}
 
@@ -6,24 +6,17 @@
 <div class="title">Login</div>
 <div class="content">
   <!-- Registration form -->
-  <form action="#">
-    <div class="user-details">
-      <!-- Input for Email -->
-      <div class="input-box">
-        <span class="details">Email</span>
-        <input type="text" placeholder="Enter your email" required>
-      </div>
-      <!-- Input for Password -->
-      <div class="input-box">
-        <span class="details">Password</span>
-        <input type="text" placeholder="Enter your password" required>
-      </div>
-    </div>
-    <!-- Submit button -->
-    <div class="button">
-      <input type="submit" value="Login">
-    </div>
-  </form>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
+    {% for field in form %}
+        {{ field.errors }}
+        {{ field.label_tag }} {{ field }}
+    {% endfor %}
+    <button type="submit">Login</button>
+</form>
+  <p>Don't have an account?<a href="{% url 'core_app:signup' %}">Register</a></p>
+
 </div>
 {% endblock content %}
 
