@@ -1,0 +1,263 @@
+{% extends "dashboard.html" %}
+
+{% block title %}Inbox - Medicare{% endblock %}
+
+
+{% block search %}
+<div class="navbar-menu-wrapper navbar-search-wrapper d-none d-lg-flex align-items-center">
+ <ul class="navbar-nav mr-lg-2">
+   <li class="nav-item nav-search d-none d-lg-block">
+     <div class="input-group">
+       <input type="text" class="form-control" placeholder="Search Here..." aria-label="search" aria-describedby="search">
+     </div>
+   </li>
+ </ul>
+</div>
+{% endblock search %}
+
+
+{% block content %}
+<div class="messaging-container">
+    <div class="messaging-sidebar">
+        <h2>Messages</h2>
+        <ul class="messaging-nav">
+            <li class="active"><a href="{% url 'inbox' %}">Inbox {% if unread_count %}<span class="badge">{{ unread_count }}</span>{% endif %}</a></li>
+            <li><a href="{% url 'sent_messages' %}">Sent</a></li>
+            <li><a href="{% url 'compose_message' %}" class="compose-btn">Compose New Message</a></li>
+        </ul>
+    </div>
+    
+    <div class="messaging-content">
+        <h1>Inbox</h1>
+        
+        {% if messages %}
+            <div class="message-list">
+                {% for message in messages %}
+                    <div class="message-item {% if not message.is_read %}unread{% endif %}">
+                        <div class="message-sender">
+                            <strong>From:</strong> {{ message.sender.get_full_name|default:message.sender.username }}
+                        </div>
+                        <div class="message-subject">
+                            <a href="{% url 'message_detail' message.id %}">{{ message.subject }}</a>
+                        </div>
+                        <div class="message-date">
+                            {{ message.timestamp|date:"M d, Y" }}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            {% if is_paginated %}
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if page_obj.has_previous %}
+                            <a href="?page=1">&laquo; first</a>
+                            <a href="?page={{ page_obj.previous_page_number }}">previous</a>
+                        {% endif %}
+                        
+                        <span class="current">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?page={{ page_obj.next_page_number }}">next</a>
+                            <a href="?page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="no-messages">
+                <p>Your inbox is empty.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .messaging-container {
+        display: flex;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        gap: 30px;
+    }
+    
+    .messaging-sidebar {
+        flex: 0 0 250px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .messaging-sidebar h2 {
+        margin-top: 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .messaging-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .messaging-nav li {
+        margin-bottom: 10px;
+    }
+    
+    .messaging-nav li a {
+        display: block;
+        padding: 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+    }
+    
+    .messaging-nav li.active a {
+        background-color: #4a69bd;
+        color: white;
+    }
+    
+    .messaging-nav li a:hover:not(.active) {
+        background-color: #f0f0f0;
+    }
+    
+    .compose-btn {
+        background-color: #4a69bd;
+        color: white !important;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .compose-btn:hover {
+        background-color: #3c5aa6 !important;
+    }
+    
+    .messaging-content {
+        flex: 1;
+    }
+    
+    .messaging-content h1 {
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    
+    .message-list {
+        border: 1px solid #eee;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .message-item {
+        display: flex;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        background-color: #fff;
+        transition: background-color 0.2s;
+    }
+    
+    .message-item:last-child {
+        border-bottom: none;
+    }
+    
+    .message-item:hover {
+        background-color: #f9f9f9;
+    }
+    
+    .message-item.unread {
+        background-color: #f0f7ff;
+        font-weight: bold;
+    }
+    
+    .message-sender {
+        flex: 0 0 30%;
+    }
+    
+    .message-subject {
+        flex: 1;
+    }
+    
+    .message-subject a {
+        color: #333;
+        text-decoration: none;
+    }
+    
+    .message-subject a:hover {
+        text-decoration: underline;
+    }
+    
+    .message-date {
+        flex: 0 0 15%;
+        text-align: right;
+        color: #666;
+    }
+    
+    .badge {
+        display: inline-block;
+        background-color: #e74c3c;
+        color: white;
+        border-radius: 50%;
+        padding: 2px 6px;
+        font-size: 0.8em;
+        margin-left: 5px;
+    }
+    
+    .no-messages {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 30px;
+        text-align: center;
+        color: #666;
+    }
+    
+    .pagination {
+        margin-top: 20px;
+        text-align: center;
+    }
+    
+    .pagination a {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 0 5px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+    }
+    
+    .pagination .current {
+        padding: 5px 10px;
+        margin: 0 5px;
+        background-color: #4a69bd;
+        color: white;
+        border-radius: 4px;
+    }
+    
+    @media (max-width: 768px) {
+        .messaging-container {
+            flex-direction: column;
+        }
+        
+        .messaging-sidebar {
+            flex: none;
+            margin-bottom: 20px;
+        }
+        
+        .message-item {
+            flex-direction: column;
+        }
+        
+        .message-sender, .message-subject, .message-date {
+            flex: none;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        
+        .message-date {
+            text-align: left;
+        }
+    }
+</style>
+{% endblock %}

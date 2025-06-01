@@ -1,0 +1,260 @@
+{% extends "dashboard.html" %}
+
+{% block title %}Search Specialists - Medicare{% endblock %}
+
+{% block content %}
+<div class="search-container">
+    <h1>Find a Specialist</h1>
+    
+    <div class="search-form">
+        <form method="get" action="{% url 'specialist_search' %}">
+            <div class="form-group">
+                <label for="id_specialty">Specialty:</label>
+                {{ form.specialty }}
+                <small class="form-text">Search by specialty</small>
+
+            </div>
+            
+            <div class="form-group">
+                <label for="id_name">Name:</label>
+                {{ form.name }}
+                <small class="form-text">Search by first or last name</small>
+            </div>
+            
+            <button type="submit" class="btn search-btn">Search</button>
+        </form>
+    </div>
+    
+    <div class="search-results">
+        <h2>Search Results</h2>
+        
+        {% if specialists %}
+            <div class="results-count">
+                <p>Found {{ page_obj.paginator.count }} specialist{{ page_obj.paginator.count|pluralize }}</p>
+            </div>
+            
+            <div class="specialists-list">
+                {% for specialist in specialists %}
+                    <div class="specialist-card">
+                        <div class="specialist-info">
+                            <h3>{{ specialist.get_full_name }}</h3>
+                            <p class="specialty">
+                                {% if specialist.specialist_profile.specialty %}
+                                    {{ specialist.specialist_profile.specialty.name }}
+                                {% else %}
+                                    Specialty not specified
+                                {% endif %}
+                            </p>
+                            
+                            {% if specialist.specialist_profile.experience_years %}
+                                <p class="experience">{{ specialist.specialist_profile.experience_years }} years of experience</p>
+                            {% endif %}
+                            
+                            {% if specialist.specialist_profile.qualifications %}
+                                <div class="qualifications">
+                                    <h4>Qualifications</h4>
+                                    <p>{{ specialist.specialist_profile.qualifications }}</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="specialist-actions">
+                            <a href="#" class="btn view-profile-btn">View Profile</a>
+                            <a href="{% url 'compose_message' %}" class="btn message-btn">Send Message</a>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+            
+            {% if is_paginated %}
+                <div class="pagination">
+                    <span class="step-links">
+                        {% if page_obj.has_previous %}
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; first</a>
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">previous</a>
+                        {% endif %}
+                        
+                        <span class="current">
+                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
+                        </span>
+                        
+                        {% if page_obj.has_next %}
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">next</a>
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                        {% endif %}
+                    </span>
+                </div>
+            {% endif %}
+        {% else %}
+            <div class="no-results">
+                <p>No specialists found matching your criteria.</p>
+                <p>Try broadening your search or selecting a different specialty.</p>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .search-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    .search-form {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 30px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .form-group {
+        margin-bottom: 15px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .form-group input,
+    .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .form-text {
+        color: #666;
+        font-size: 0.9em;
+    }
+    
+    .search-btn {
+        background-color: #4a69bd;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 1em;
+    }
+    
+    .search-btn:hover {
+        background-color: #3c5aa6;
+    }
+    
+    .results-count {
+        margin-bottom: 20px;
+        font-weight: bold;
+    }
+    
+    .specialist-card {
+        background-color: #fff;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 20px;
+        margin-bottom: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+    }
+    
+    .specialist-info {
+        flex: 1;
+    }
+    
+    .specialist-info h3 {
+        margin-top: 0;
+        color: #333;
+    }
+    
+    .specialty {
+        color: #4a69bd;
+        font-weight: bold;
+        margin-bottom: 10px;
+    }
+    
+    .experience {
+        color: #666;
+        margin-bottom: 10px;
+    }
+    
+    .qualifications {
+        margin-top: 15px;
+    }
+    
+    .qualifications h4 {
+        margin-bottom: 5px;
+        color: #555;
+    }
+    
+    .specialist-actions {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-left: 20px;
+    }
+    
+    .view-profile-btn,
+    .message-btn {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        text-align: center;
+        min-width: 120px;
+    }
+    
+    .view-profile-btn {
+        background-color: #f0f0f0;
+        color: #333;
+    }
+    
+    .message-btn {
+        background-color: #4a69bd;
+        color: white;
+    }
+    
+    .view-profile-btn:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .message-btn:hover {
+        background-color: #3c5aa6;
+    }
+    
+    .pagination {
+        margin-top: 30px;
+        text-align: center;
+    }
+    
+    .pagination a {
+        display: inline-block;
+        padding: 5px 10px;
+        margin: 0 5px;
+        background-color: #f0f0f0;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+    }
+    
+    .pagination .current {
+        padding: 5px 10px;
+        margin: 0 5px;
+        background-color: #4a69bd;
+        color: white;
+        border-radius: 4px;
+    }
+    
+    .no-results {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 20px;
+        text-align: center;
+    }
+</style>
+{% endblock %}

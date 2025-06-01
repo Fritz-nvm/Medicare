@@ -1,0 +1,217 @@
+{% extends "dashboard.html" %}
+
+{% block title %}Compose Message - Medicare{% endblock %}
+
+{% block content %}
+<div class="messaging-container">
+    <div class="messaging-sidebar">
+        <h2>Messages</h2>
+        <ul class="messaging-nav">
+            <li><a href="{% url 'inbox' %}">Inbox</a></li>
+            <li><a href="{% url 'sent_messages' %}">Sent</a></li>
+            <li class="active"><a href="{% url 'compose_message' %}" class="compose-btn">Compose New Message</a></li>
+        </ul>
+    </div>
+    
+    <div class="messaging-content">
+        <h1>Compose New Message</h1>
+        
+        {% if recipient %}
+            <div class="recipient-info">
+                <p>To: <strong>{{ recipient.get_full_name|default:recipient.username }}</strong></p>
+            </div>
+        {% else %}
+            <div class="alert alert-warning">
+                <p>No recipient selected. Please select a recipient from the specialist search.</p>
+            </div>
+        {% endif %}
+        
+        <div class="compose-form">
+            <form method="post">
+                {% csrf_token %}
+                
+                <div class="form-group">
+                    <label for="id_subject">Subject:</label>
+                    {{ form.subject }}
+                </div>
+                
+                <div class="form-group">
+                    <label for="id_content">Message:</label>
+                    {{ form.content }}
+                </div>
+                
+                <div class="form-actions">
+                    <a href="{% if request.META.HTTP_REFERER %}{{ request.META.HTTP_REFERER }}{% else %}{% url 'inbox' %}{% endif %}" class="cancel-btn">Cancel</a>
+                    <button type="submit" class="send-btn">Send Message</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .messaging-container {
+        display: flex;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        gap: 30px;
+    }
+    
+    .messaging-sidebar {
+        flex: 0 0 250px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .messaging-sidebar h2 {
+        margin-top: 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .messaging-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .messaging-nav li {
+        margin-bottom: 10px;
+    }
+    
+    .messaging-nav li a {
+        display: block;
+        padding: 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+    }
+    
+    .messaging-nav li.active a {
+        background-color: #4a69bd;
+        color: white;
+    }
+    
+    .messaging-nav li a:hover:not(.active) {
+        background-color: #f0f0f0;
+    }
+    
+    .compose-btn {
+        background-color: #4a69bd;
+        color: white !important;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .compose-btn:hover {
+        background-color: #3c5aa6 !important;
+    }
+    
+    .messaging-content {
+        flex: 1;
+    }
+    
+    .messaging-content h1 {
+        margin-top: 0;
+        margin-bottom: 20px;
+    }
+    
+    .recipient-info {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .alert {
+        padding: 15px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+    }
+    
+    .alert-warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+    }
+    
+    .compose-form {
+        background-color: white;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 20px;
+    }
+    
+    .form-group {
+        margin-bottom: 20px;
+    }
+    
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+    }
+    
+    .form-group input,
+    .form-group textarea {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: inherit;
+    }
+    
+    .form-group textarea {
+        min-height: 200px;
+    }
+    
+    .form-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 30px;
+    }
+    
+    .cancel-btn, .send-btn {
+        padding: 10px 20px;
+        border-radius: 4px;
+        text-decoration: none;
+        cursor: pointer;
+        font-size: 1em;
+    }
+    
+    .cancel-btn {
+        background-color: #f0f0f0;
+        color: #333;
+        border: none;
+    }
+    
+    .send-btn {
+        background-color: #4a69bd;
+        color: white;
+        border: none;
+    }
+    
+    .cancel-btn:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .send-btn:hover {
+        background-color: #3c5aa6;
+    }
+    
+    @media (max-width: 768px) {
+        .messaging-container {
+            flex-direction: column;
+        }
+        
+        .messaging-sidebar {
+            flex: none;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="row">
+      <!-- Page Header -->
+      <div class="col-12 grid-margin">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center">
+              <h2 class="card-title mb-0">My Patients</h2>
+              <div class="dropdown">
+                <button class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown">
+                  Filter Patients
+                </button>
+                <div class="dropdown-menu">
+                  <a class="dropdown-item" href="?status=active">Active</a>
+                  <a class="dropdown-item" href="?status=inactive">Inactive</a>
+                  <a class="dropdown-item" href="?status=all">All Patients</a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Patients List -->
+      <div class="col-12 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-hover">
+                <thead>
+                  <tr>
+                    <th>Patient</th>
+                    <th>Last Visit</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for patient in patients %}
+                  <tr>
+                    <td>
+                      <div class="d-flex align-items-center">
+                        <img src="{% if patient.profile_picture %}{{ patient.profile_picture.url }}{% else %}{% static 'images/default-avatar.jpg' %}{% endif %}" 
+                             class="img-sm rounded-circle" alt="profile">
+                        <div class="ml-3">
+                          <h6 class="mb-1">{{ patient.get_full_name }}</h6>
+                          <p class="text-muted mb-0">{{ patient.email }}</p>
+                        </div>
+                      </div>
+                    </td>
+                    <td>{{ patient.last_visit|date:"M d, Y"|default:"Never" }}</td>
+                    <td>
+                      <div class="badge {% if patient.is_active %}badge-success{% else %}badge-danger{% endif %}">
+                        {% if patient.is_active %}Active{% else %}Inactive{% endif %}
+                      </div>
+                    </td>
+                    <td>
+                      <a href="#" class="btn btn-outline-primary btn-sm">View</a>
+                      <a href="#" class="btn btn-outline-secondary btn-sm">Message</a>
+                    </td>
+                  </tr>
+                  {% empty %}
+                  <tr>
+                    <td colspan="4" class="text-center py-4">
+                      <p class="text-muted">No patients found</p>
+                      <a href="#" class="btn btn-primary">Invite Patients</a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination -->
+            {% if patients.has_other_pages %}
+            <div class="mt-4">
+              <nav>
+                <ul class="pagination">
+                  {% if patients.has_previous %}
+                  <li class="page-item"><a class="page-link" href="?page={{ patients.previous_page_number }}">Previous</a></li>
+                  {% endif %}
+                  
+                  {% for i in patients.paginator.page_range %}
+                  <li class="page-item {% if patients.number == i %}active{% endif %}">
+                    <a class="page-link" href="?page={{ i }}">{{ i }}</a>
+                  </li>
+                  {% endfor %}
+                  
+                  {% if patients.has_next %}
+                  <li class="page-item"><a class="page-link" href="?page={{ patients.next_page_number }}">Next</a></li>
+                  {% endif %}
+                </ul>
+              </nav>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

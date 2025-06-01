@@ -1,0 +1,104 @@
+{% extends 'dashboard.html' %}
+{% load static %}
+
+{% block content %}
+<div class="main-panel">
+  <div class="content-wrapper">
+    <div class="row">
+      <!-- Profile Header -->
+      <div class="col-12 grid-margin">
+        <div class="card">
+          <div class="card-body">
+            <div class="d-flex align-items-center">
+              <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default-avatar.jpg' %}{% endif %}" 
+                   class="img-lg rounded-circle" alt="profile image">
+              <div class="ml-4">
+                <h2 class="mb-1">{{ user.get_full_name|default:user.username }}</h2>
+                <p class="text-muted mb-0">{{ user.specialty.name|default:"Member" }}</p>
+                <div class="badge badge-outline-success mt-2">
+                  {% if user_type == 'patient' %}Patient{% else %}Specialist{% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Main Profile Sections -->
+      <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Personal Information</h4>
+            <form method="post" enctype="multipart/form-data">
+              {% csrf_token %}
+              <div class="form-group">
+                <label>Profile Picture</label>
+                <input type="file" name="profile_picture" class="file-upload-default">
+                <div class="input-group">
+                  <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
+                  <span class="input-group-append">
+                    <button class="file-upload-browse btn btn-primary" type="button">Change</button>
+                  </span>
+                </div>
+              </div>
+              <div class="form-group">
+                <label>First Name</label>
+                <input type="text" class="form-control" name="first_name" value="{{ user.first_name }}" required>
+              </div>
+              <div class="form-group">
+                <label>Last Name</label>
+                <input type="text" class="form-control" name="last_name" value="{{ user.last_name }}" required>
+              </div>
+              <div class="form-group">
+                <label>Email</label>
+                <input type="email" class="form-control" value="{{ user.email }}" readonly>
+              </div>
+              <div class="form-group">
+                <label>Phone</label>
+                <input type="tel" class="form-control" name="phone" value="{{ user.phone_number|default:'' }}">
+              </div>
+              <button type="submit" class="btn btn-primary mr-2">Update Profile</button>
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-6 grid-margin stretch-card">
+        <div class="card">
+          <div class="card-body">
+            <h4 class="card-title">Account Security</h4>
+            <div class="mb-4">
+              <h6>Password</h6>
+              <p>Last changed: {{ user.password_changed_date|date:"M d, Y"|default:"Never" }}</p>
+              <a href="{% url 'password_change' %}" class="btn btn-outline-primary">Change Password</a>
+            </div>
+            {% if user_type == 'specialist' %}
+            <div class="mb-4">
+              <h6>Professional Information</h6>
+              <form method="post">
+                {% csrf_token %}
+                <div class="form-group">
+                  <label>Specialty</label>
+                  <select class="form-control" name="specialty">
+                    {% for specialty in specialties %}
+                    <option value="{{ specialty.id }}" {% if user.specialist_profile.specialty.id == specialty.id %}selected{% endif %}>
+                      {{ specialty.name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label>Qualifications</label>
+                  <textarea class="form-control" name="qualifications" rows="3">{{ user.specialist_profile.qualifications|default:'' }}</textarea>
+                </div>
+                <button type="submit" class="btn btn-primary">Update</button>
+              </form>
+            </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

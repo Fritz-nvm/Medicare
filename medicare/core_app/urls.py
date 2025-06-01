@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import SignUpView, homepage, PatientSignUpView, SpecialistSignUpView, patient_dashboard
+from .views import SignUpView, homepage, PatientSignUpView, SpecialistSignUpView, DashboardView, patients, profile
 
 app_name='core_app'
 
@@ -11,7 +11,11 @@ urlpatterns = [
 
     #dashboard urls 
 
-    path('patient-dashboard/', patient_dashboard, name='patient_dashboard'),
+    path('dashboard/', DashboardView.as_view(), name='dashboard'),
+    path('patient/', patients, name='patients'),
+    path('profile/', profile, name='profile'),
+
+
 
    
 ]

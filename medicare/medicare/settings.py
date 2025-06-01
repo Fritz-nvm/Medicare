@@ -127,7 +127,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'core_app.User' # Added custom user model setting
 
 # Login/Logout Redirect URLs (Optional, but good practice)
-LOGIN_REDIRECT_URL = '/' # Redirect after login
+LOGIN_REDIRECT_URL = 'dashboard' # Redirect after login to dashboard
 LOGOUT_REDIRECT_URL = '/' # Redirect after logout
 
+AX_FAILED_LOGIN_ATTEMPTS = 5
+AX_COOLOFF_TIME = 1  # 1 hour
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 

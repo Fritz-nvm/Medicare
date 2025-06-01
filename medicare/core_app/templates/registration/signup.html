@@ -3,18 +3,35 @@
 {% block title %}Registration {% endblock %}
 
 {% block content %}
-<div class="title">Are you a patient or a specialist?</div>
-<div class="content">
-  <div class="button" id="signup_btn">
-    <!-- <input type="submit" value="Login"> -->
-    <a type="submit" href="{% url 'core_app:patient_signup' %}"><button>I am a Patient</button></a>
-  </div>
+<div class="container-fluid page-body-wrapper full-page-wrapper d-flex">
+  <div class="content-wrapper d-flex align-items-center auth px-0">
+    <div class="row w-100 mx-0">
+      <div class="col-lg-4 mx-auto">
+        <div class="auth-form-light text-left py-5 px-4 px-sm-5">
+          <h4>Hello! let's get started</h4>
+          <h6 class="font-weight-light">  <p>Are you a patient or a specialist?</p>
+          </h6>
 
-  <div class="button" id="signup_btn">
-    <!-- <input type="submit" value="Login"> -->
-    <a type="submit" href="{% url 'core_app:specialist_signup' %}"><button>I am a Specialist</button></a>
+          <form class="pt-3" method="post" action="{% url 'login' %}">
+           
+            <div class="mt-3">
+              <a class="btn btn-block btn-primary btn-lg font-weight-medium" href="{% url 'core_app:patient_signup' %}" >I AM A PATIENT</a>
+            </div>
+
+            <div class="mt-3">
+              <a class="btn btn-block btn-primary btn-lg font-weight-medium " href="{% url 'core_app:specialist_signup' %}" >I AM A SPECIALIST</a>
+            </div>
+
+
+
+          </form>
+
+
+        </div>
+      </div>
+    </div>
   </div>
+  <!-- content-wrapper ends -->
 </div>
-
 {% endblock %}
 

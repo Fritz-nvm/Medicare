@@ -1,0 +1,173 @@
+{% extends "dashboard.html" %}
+
+{% block title %}Message Details - Medicare{% endblock %}
+
+{% block content %}
+<div class="messaging-container">
+    <div class="messaging-sidebar">
+        <h2>Messages</h2>
+        <ul class="messaging-nav">
+            <li><a href="{% url 'inbox' %}">Inbox</a></li>
+            <li><a href="{% url 'sent_messages' %}">Sent</a></li>
+            <li><a href="{% url 'compose_message' %}" class="compose-btn">Compose New Message</a></li>
+        </ul>
+    </div>
+    
+    <div class="messaging-content">
+        <div class="message-header">
+            <div class="message-actions">
+                <a href="{% if message.sender == request.user %}{% url 'sent_messages' %}{% else %}{% url 'inbox' %}{% endif %}" class="back-btn">← Back</a>
+                {% if message.recipient == request.user %}
+                    <a href="{% url 'compose_message' %}?recipient={{ message.sender.id }}" class="reply-btn">Reply</a>
+                {% endif %}
+            </div>
+            
+            <h1>{{ message.subject }}</h1>
+            
+            <div class="message-meta">
+                <div class="message-from">
+                    <strong>From:</strong> {{ message.sender.get_full_name|default:message.sender.username }}
+                </div>
+                <div class="message-to">
+                    <strong>To:</strong> {{ message.recipient.get_full_name|default:message.recipient.username }}
+                </div>
+                <div class="message-date">
+                    <strong>Date:</strong> {{ message.timestamp|date:"F d, Y, g:i a" }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="message-body">
+            {{ message.content|linebreaks }}
+        </div>
+    </div>
+</div>
+
+<style>
+    .messaging-container {
+        display: flex;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 20px;
+        gap: 30px;
+    }
+    
+    .messaging-sidebar {
+        flex: 0 0 250px;
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    
+    .messaging-sidebar h2 {
+        margin-top: 0;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #eee;
+    }
+    
+    .messaging-nav {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .messaging-nav li {
+        margin-bottom: 10px;
+    }
+    
+    .messaging-nav li a {
+        display: block;
+        padding: 10px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+    }
+    
+    .messaging-nav li.active a {
+        background-color: #4a69bd;
+        color: white;
+    }
+    
+    .messaging-nav li a:hover:not(.active) {
+        background-color: #f0f0f0;
+    }
+    
+    .compose-btn {
+        background-color: #4a69bd;
+        color: white !important;
+        text-align: center;
+        font-weight: bold;
+    }
+    
+    .compose-btn:hover {
+        background-color: #3c5aa6 !important;
+    }
+    
+    .messaging-content {
+        flex: 1;
+    }
+    
+    .message-header {
+        margin-bottom: 30px;
+    }
+    
+    .message-actions {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 20px;
+    }
+    
+    .back-btn, .reply-btn {
+        display: inline-block;
+        padding: 8px 16px;
+        border-radius: 4px;
+        text-decoration: none;
+        color: #333;
+        background-color: #f0f0f0;
+    }
+    
+    .reply-btn {
+        background-color: #4a69bd;
+        color: white;
+    }
+    
+    .back-btn:hover {
+        background-color: #e0e0e0;
+    }
+    
+    .reply-btn:hover {
+        background-color: #3c5aa6;
+    }
+    
+    .message-meta {
+        background-color: #f9f9f9;
+        border-radius: 8px;
+        padding: 15px;
+        margin-bottom: 20px;
+    }
+    
+    .message-from, .message-to, .message-date {
+        margin-bottom: 5px;
+    }
+    
+    .message-body {
+        background-color: white;
+        border: 1px solid #eee;
+        border-radius: 8px;
+        padding: 20px;
+        line-height: 1.6;
+    }
+    
+    @media (max-width: 768px) {
+        .messaging-container {
+            flex-direction: column;
+        }
+        
+        .messaging-sidebar {
+            flex: none;
+            margin-bottom: 20px;
+        }
+    }
+</style>
+{% endblock %}

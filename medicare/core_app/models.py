@@ -2,6 +2,8 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
+
 
 class UserManager(BaseUserManager):
     def _create_user(self, email, password=None, **extra_fields):
@@ -82,18 +84,24 @@ class PatientProfile(models.Model):
     def __str__(self):
         return f"Patient: {self.user.get_full_name() or self.user.username}"
 
-# Message model will be added later when implementing messaging feature
-# class Message(models.Model):
-#     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
-#     recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_messages')
-#     subject = models.CharField(max_length=255, blank=True)
-#     body = models.TextField()
-#     timestamp = models.DateTimeField(auto_now_add=True)
-#     is_read = models.BooleanField(default=False)
-#
-#     def __str__(self):
-#         return f"From {self.sender} to {self.recipient} at {self.timestamp:%Y-%m-%d %H:%M}"
-#
-#     class Meta:
-#         ordering = ['-timestamp']
+
+class Message(models.Model):
+    """Model for messages between patients and specialists."""
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='sent_messages')
+    recipient = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='received_messages')
+    subject = models.CharField(max_length=255)
+    content = models.TextField()
+    timestamp = models.DateTimeField(default=timezone.now)
+    is_read = models.BooleanField(default=False)
+    
+    class Meta:
+        ordering = ['-timestamp']
+    
+    def __str__(self):
+        return f"Message from {self.sender.username} to {self.recipient.username}"
+    
+    def mark_as_read(self):
+        if not self.is_read:
+            self.is_read = True
+            self.save()
 

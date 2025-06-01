@@ -16,6 +16,11 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.views.generic import TemplateView
+from django.contrib.auth import views as auth_views
+
+from core_app.views import DashboardView, SpecialistSearchView, InboxView, SentMessagesView, MessageDetailView, ComposeMessageView, compose_to_specialist
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -23,5 +28,15 @@ urlpatterns = [
     path("", include("core_app.urls")), 
     # Include Django's built-in auth URLs (login, logout, password management) under /accounts/
     path("accounts/", include("django.contrib.auth.urls")), 
+
+    path("dashboard/", DashboardView.as_view(), name="dashboard"),
+    # Add specialist search view
+    path("specialists/search/", SpecialistSearchView.as_view(), name="specialist_search"),
+    # Add messaging views
+    path("messages/inbox/", InboxView.as_view(), name="inbox"),
+    path("messages/sent/", SentMessagesView.as_view(), name="sent_messages"),
+    path("messages/view/<int:pk>/", MessageDetailView.as_view(), name="message_detail"),
+    path("messages/compose/", ComposeMessageView.as_view(), name="compose_message"),
+    path("messages/compose/specialist/<int:specialist_id>/", compose_to_specialist, name="compose_to_specialist"),
    
 ]

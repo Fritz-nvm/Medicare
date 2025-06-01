@@ -3,7 +3,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.db import transaction
-from .models import User, PatientProfile, SpecialistProfile, Specialty
+from .models import User, PatientProfile, SpecialistProfile, Specialty, Message
 
 class PatientSignUpForm(UserCreationForm):
     email = forms.EmailField(max_length=254, required=True, help_text='Required. Enter a valid email address.')
@@ -61,3 +61,34 @@ class SpecialistSignUpForm(UserCreationForm):
                 experience_years=self.cleaned_data['experience_years']
             )
         return user
+
+
+
+# Add the SpecialistSearchForm for searching specialists
+class SpecialistSearchForm(forms.Form):
+    specialty = forms.ModelChoiceField(
+        queryset=Specialty.objects.all(), 
+        required=False,
+        empty_label="All Specialties"
+    )
+    name = forms.CharField(required=False)
+    
+    def clean(self):
+        cleaned_data = super().clean()
+        specialty = cleaned_data.get('specialty')
+        name = cleaned_data.get('name')
+        
+        # Ensure at least one search parameter is provided
+        if not specialty and not name:
+            raise forms.ValidationError("Please provide at least one search parameter")
+        
+        return cleaned_data
+
+# Add the MessageForm for sending messages
+class MessageForm(forms.ModelForm):
+    class Meta:
+        model = Message
+        fields = ['subject', 'content']
+        widgets = {
+            'content': forms.Textarea(attrs={'rows': 5}),
+        }
