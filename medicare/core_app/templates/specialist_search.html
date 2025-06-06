@@ -60,7 +60,7 @@
                         
                         <div class="specialist-actions">
                             <a href="#" class="btn view-profile-btn">View Profile</a>
-                            <a href="{% url 'compose_message' %}" class="btn message-btn">Send Message</a>
+                            <a href="{% url 'compose_to_specialist' specialist.id %}" class="btn message-btn">Send Message</a>
                         </div>
                     </div>
                 {% endfor %}
