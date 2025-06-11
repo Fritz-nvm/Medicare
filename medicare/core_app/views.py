@@ -6,11 +6,11 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.db.models import Q
 from django.contrib import messages
+from django.core.exceptions import ValidationError
 
 
-
-from .forms import PatientSignUpForm, SpecialistSignUpForm, SpecialistSearchForm, MessageForm
-from .models import User, Specialty, Message
+from .forms import PatientSignUpForm, SpecialistSignUpForm, SpecialistSearchForm, MessageForm, ProfileUpdateForm
+from .models import User, Specialty, Message, Hospital, SpecialistProfile
 
 
 # Create your views here.
@@ -20,8 +20,14 @@ def homepage(request):
 def patients(request):
     return render(request, 'patients.html')
 
-def profile(request):
-    return render(request, 'profile.html')
+@login_required
+def profile(request): 
+    return render(request, 'profile.html')  # Pass the context
+    
+
+def view_info(request):
+    return render(request, 'view_info.html')
+
 
 
 
@@ -41,7 +47,6 @@ class PatientSignUpView(CreateView):
         user = form.save()
         # Log the user in.
         login(self.request, user)
-        # Redirect to a success page or home page
         # return redirect("home") # Replace "home" with your actual home page URL name
         return redirect(reverse_lazy("core_app:dashboard")) # Or redirect to login for now
 
@@ -56,6 +61,8 @@ class SpecialistSignUpView(CreateView):
         
         # Add dropdown options from database
         context['specialties'] = Specialty.objects.all()
+        context['Hospital'] = Hospital.objects.all()
+
         
         return context
 
@@ -63,14 +70,13 @@ class SpecialistSignUpView(CreateView):
         user = form.save()
         # Log the user in.
         login(self.request, user)
-        # Redirect to a success page or home page
         # return redirect("home") # Replace "home" with your actual home page URL name
-        return redirect(reverse_lazy("core_app:dashboard")) # Or redirect to login for now
+        return redirect(reverse_lazy("specialist_search")) # Or redirect to login for now
 
 
 @method_decorator(login_required, name='dispatch')
 class DashboardView(TemplateView):
-    template_name = "dashboard_home.html"
+    template_name = "specialist_search.html"
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

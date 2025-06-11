@@ -10,13 +10,22 @@
         <div class="card">
           <div class="card-body">
             <div class="d-flex align-items-center">
-              <img src="{% if user.profile_picture %}{{ user.profile_picture.url }}{% else %}{% static 'images/default-avatar.jpg' %}{% endif %}" 
+              <img src="{% if user.specialist_profile.profile_picture %}{{ user.specialist_profile.profile_picture.url }}{% else %}{% static 'images/default-avatar.jpg' %}{% endif %}" 
                    class="img-lg rounded-circle" alt="profile image">
               <div class="ml-4">
                 <h2 class="mb-1">{{ user.get_full_name|default:user.username }}</h2>
-                <p class="text-muted mb-0">{{ user.specialty.name|default:"Member" }}</p>
+                <p class="text-muted mb-0">
+                  {% if user.specialist_profile%}
+                  {{ user.specialist_profile.specialty.name}}
+                  {% endif %}
+                  {% if user.specialist_profile.hospital %}
+                    at {{ user.specialist_profile.hospital.name }}
+                  {% else %}
+                    (Patient)
+                  {% endif %}
+                </p>
                 <div class="badge badge-outline-success mt-2">
-                  {% if user_type == 'patient' %}Patient{% else %}Specialist{% endif %}
+                  Specialist
                 </div>
               </div>
             </div>
@@ -33,7 +42,7 @@
               {% csrf_token %}
               <div class="form-group">
                 <label>Profile Picture</label>
-                <input type="file" name="profile_picture" class="file-upload-default">
+                <input type="file" name="profile_picture">
                 <div class="input-group">
                   <input type="text" class="form-control file-upload-info" disabled placeholder="Upload Image">
                   <span class="input-group-append">
@@ -66,35 +75,70 @@
       <div class="col-md-6 grid-margin stretch-card">
         <div class="card">
           <div class="card-body">
-            <h4 class="card-title">Account Security</h4>
+            <h4 class="card-title">Professional Details</h4>
+            
+            <!-- Professional Information -->
             <div class="mb-4">
-              <h6>Password</h6>
-              <p>Last changed: {{ user.password_changed_date|date:"M d, Y"|default:"Never" }}</p>
-              <a href="{% url 'password_change' %}" class="btn btn-outline-primary">Change Password</a>
-            </div>
-            {% if user_type == 'specialist' %}
-            <div class="mb-4">
-              <h6>Professional Information</h6>
               <form method="post">
                 {% csrf_token %}
                 <div class="form-group">
                   <label>Specialty</label>
-                  <select class="form-control" name="specialty">
+                  <select class="form-control" name="specialty" required>
                     {% for specialty in specialties %}
-                    <option value="{{ specialty.id }}" {% if user.specialist_profile.specialty.id == specialty.id %}selected{% endif %}>
+                    <option value="{{ specialty.id }}" 
+                            {% if user.specialist_profile.specialty.id == specialty.id %}selected{% endif %}>
                       {{ specialty.name }}
                     </option>
                     {% endfor %}
                   </select>
                 </div>
+                
                 <div class="form-group">
                   <label>Qualifications</label>
-                  <textarea class="form-control" name="qualifications" rows="3">{{ user.specialist_profile.qualifications|default:'' }}</textarea>
+                  <textarea class="form-control" name="qualifications" rows="3" required>
+                    {{ user.specialist_profile.qualifications|default:'' }}
+                  </textarea>
                 </div>
-                <button type="submit" class="btn btn-primary">Update</button>
+                
+                <div class="form-group">
+                  <label>Years of Experience</label>
+                  <input type="number" class="form-control" name="experience_years" 
+                         value="{{ user.specialist_profile.experience_years|default:0 }}" min="0" required>
+                </div>
+                
+                <div class="form-group">
+                  <label>Hospital/Clinic Affiliation</label>
+                  <select class="form-control" name="hospital">
+                    <option value="">-- Independent Practitioner --</option>
+                    {% for hospital in hospitals %}
+                    <option value="{{ hospital.id }}"
+                            {% if user.specialist_profile.hospital.id == hospital.id %}selected{% endif %}>
+                      {{ hospital.name }}
+                    </option>
+                    {% endfor %}
+                  </select>
+                </div>
+                
+                {% if not user.specialist_profile.hospital %}
+                <div class="form-group">
+                  <label>Specialist ID</label>
+                  <input type="text" class="form-control" name="specialist_id" 
+                         value="{{ user.specialist_profile.specialist_id|default:'' }}"
+                         placeholder="SP-XXXX-XXXX">
+                  <small class="form-text text-muted">Required for independent practitioners</small>
+                </div>
+                {% endif %}
+                
+                <button type="submit" class="btn btn-primary">Update Professional Info</button>
               </form>
             </div>
-            {% endif %}
+            
+            <!-- Account Security -->
+            <div class="mt-4 pt-4 border-top">
+              <h6>Account Security</h6>
+              <p>Last password change: {{ user.password_changed_date|date:"M d, Y"|default:"Never" }}</p>
+              <a href="{% url 'password_change' %}" class="btn btn-outline-primary">Change Password</a>
+            </div>
           </div>
         </div>
       </div>

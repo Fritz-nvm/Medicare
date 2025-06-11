@@ -1,5 +1,8 @@
 from django.urls import path, include
-from .views import SignUpView, homepage, PatientSignUpView, SpecialistSignUpView, DashboardView, patients, profile
+from .views import SignUpView, homepage, PatientSignUpView, SpecialistSignUpView, DashboardView, patients, profile, view_info
+from django.conf import settings
+from django.conf.urls.static import static
+
 
 app_name='core_app'
 
@@ -15,7 +18,8 @@ urlpatterns = [
     path('patient/', patients, name='patients'),
     path('profile/', profile, name='profile'),
 
-
-
+    path('view-information/', view_info, name='specialist_information'),
    
 ]
+if settings.DEBUG:  # Only in development
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

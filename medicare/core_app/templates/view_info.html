@@ -1,0 +1,729 @@
+{% extends 'dashboard.html' %}  
+{% load static %}
+
+{% block content %}
+<div class="specialist-profile-container">
+    <!-- Profile Header Section -->
+    <div class="profile-header">
+        <div class="profile-avatar">
+            <img src="{% if specialist.specialist_profile.profile_picture %}{{ specialist.specialist_profile.profile_picture.url }}{% else %}{% static 'media/default-avatar.jpg' %}{% endif %}" 
+                 alt="{{ specialist.get_full_name }}">
+            <div class="verification-badge">
+                <i class="fas fa-check-circle"></i>
+                <span>Verified</span>
+            </div>
+        </div>
+        
+        <div class="profile-info">
+            <h1>Dr. {{ specialist.get_full_name }}</h1>
+            <div class="specialty-tag">
+                <i class="fas fa-user-md"></i>
+                {{ specialist.specialist_profile.specialty.name|default:"General Practitioner" }}
+            </div>
+            
+            <div class="rating-container">
+                <div class="stars">
+                    {% for i in "12345" %}
+                        <i class="fas fa-star {% if forloop.counter <= specialist.average_rating %}filled{% endif %}"></i>
+                    {% endfor %}
+                    <span>({{ specialist.review_count }} reviews)</span>
+                </div>
+            </div>
+            
+            <div class="profile-meta">
+                <div class="meta-item">
+                    <i class="fas fa-briefcase"></i>
+                    <span>{{ specialist.specialist_profile.experience_years|default:"0" }} years experience</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-language"></i>
+                    <span>{{ specialist.specialist_profile.languages|default:"English" }}</span>
+                </div>
+                <div class="meta-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <span>{{ specialist.specialist_profile.location|default:"Location not specified" }}</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="action-buttons">
+            <button class="btn primary-btn">
+                <i class="fas fa-calendar-check"></i> Book Appointment
+            </button>
+            <button class="btn secondary-btn">
+                <i class="fas fa-envelope"></i> Send Message
+            </button>
+        </div>
+    </div>
+    
+    <!-- Main Content Area -->
+    <div class="profile-content">
+        <!-- Left Column -->
+        <div class="left-column">
+            <!-- About Section -->
+            <section class="profile-section">
+                <h2><i class="fas fa-user"></i> About</h2>
+                <div class="section-content">
+                    <p>{{ specialist.specialist_profile.bio|default:"No biography provided." }}</p>
+                </div>
+            </section>
+            
+            <!-- Education Section -->
+            <section class="profile-section">
+                <h2><i class="fas fa-graduation-cap"></i> Education & Qualifications</h2>
+                <div class="section-content">
+                    <div class="qualification-item">
+                        <h3>{{ specialist.specialist_profile.medical_school|default:"Medical School" }}</h3>
+                        <p class="date">{{ specialist.specialist_profile.graduation_year|default:"Year" }}</p>
+                        <p>{{ specialist.specialist_profile.qualifications|default:"No qualifications specified." }}</p>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Experience Section -->
+            <section class="profile-section">
+                <h2><i class="fas fa-briefcase"></i> Experience</h2>
+                <div class="section-content">
+                    {% if specialist.specialist_profile.experience_set.all %}
+                        {% for exp in specialist.specialist_profile.experience_set.all %}
+                        <div class="experience-item">
+                            <h3>{{ exp.position }} at {{ exp.institution }}</h3>
+                            <p class="date">{{ exp.start_date|date:"Y" }} - {% if exp.current %}Present{% else %}{{ exp.end_date|date:"Y" }}{% endif %}</p>
+                            <p>{{ exp.description }}</p>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>No experience information provided.</p>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="right-column">
+            <!-- Contact Card -->
+            <div class="contact-card">
+                <h3><i class="fas fa-info-circle"></i> Contact Information</h3>
+                <div class="contact-item">
+                    <i class="fas fa-hospital"></i>
+                    <div>
+                        <strong>Hospital/Clinic</strong>
+                        <p>{{ specialist.specialist_profile.hospital|default:"Not specified" }}</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <div>
+                        <strong>Address</strong>
+                        <p>{{ specialist.specialist_profile.address|default:"Address not provided" }}</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-phone"></i>
+                    <div>
+                        <strong>Phone</strong>
+                        <p>{{ specialist.specialist_profile.phone|default:"Not provided" }}</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-envelope"></i>
+                    <div>
+                        <strong>Email</strong>
+                        <p>{{ specialist.email }}</p>
+                    </div>
+                </div>
+                <div class="contact-item">
+                    <i class="fas fa-globe"></i>
+                    <div>
+                        <strong>Website</strong>
+                        <p>
+                            {% if specialist.specialist_profile.website %}
+                                <a href="{{ specialist.specialist_profile.website }}" target="_blank">Visit website</a>
+                            {% else %}
+                                Not provided
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Availability Card -->
+            <div class="availability-card">
+                <h3><i class="fas fa-calendar-alt"></i> Availability</h3>
+                <div class="availability-calendar">
+                    <!-- This would be replaced with a real calendar component -->
+                    <div class="calendar-placeholder">
+                        <p>Monday - Friday: 9:00 AM - 5:00 PM</p>
+                        <p>Saturday: 10:00 AM - 2:00 PM</p>
+                        <p>Sunday: Closed</p>
+                    </div>
+                </div>
+                <button class="btn primary-btn full-width-btn">
+                    <i class="fas fa-calendar-check"></i> Check Full Availability
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Reviews Section -->
+    <section class="reviews-section">
+        <h2><i class="fas fa-star"></i> Patient Reviews</h2>
+        
+        <div class="reviews-summary">
+            <div class="overall-rating">
+                <span class="rating-number">{{ specialist.average_rating|default:"5.0" }}</span>
+                <div class="stars">
+                    {% for i in "12345" %}
+                        <i class="fas fa-star filled"></i>
+                    {% endfor %}
+                </div>
+                <p>{{ specialist.review_count }} reviews</p>
+            </div>
+           
+        </div>
+        
+        <div class="reviews-list">
+            {% for review in specialist.reviews.all|slice:":5" %}
+            <div class="review-card">
+                <div class="reviewer-info">
+                    <div class="reviewer-avatar">
+                        {% if review.patient.profile_picture %}
+                            <img src="{{ review.patient.profile_picture.url }}" alt="{{ review.patient.get_full_name }}">
+                        {% else %}
+                            <div class="initials-avatar">{{ review.patient.get_initials }}</div>
+                        {% endif %}
+                    </div>
+                    <div class="reviewer-meta">
+                        <h4>{{ review.patient.get_full_name }}</h4>
+                        <div class="review-rating">
+                            {% for i in "12345" %}
+                                <i class="fas fa-star {% if forloop.counter <= review.rating %}filled{% endif %}"></i>
+                            {% endfor %}
+                            <span class="review-date">{{ review.created_at|date:"M d, Y" }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="review-content">
+                    <h5>{{ review.title }}</h5>
+                    <p>{{ review.content }}</p>
+                </div>
+            </div>
+            {% empty %}
+            <div class="no-reviews">
+                <i class="fas fa-comment-slash"></i>
+                <p>No reviews yet</p>
+            </div>
+            {% endfor %}
+        </div>
+        
+        {% if specialist.reviews.count > 5 %}
+        <div class="view-all-reviews">
+            <button class="btn secondary-btn">
+                <i class="fas fa-list"></i> View All Reviews
+            </button>
+        </div>
+        {% endif %}
+    </section>
+</div>
+
+<style>
+/* Base Styles */
+:root {
+    --primary-color: #4361ee;
+    --primary-light: #e6e9ff;
+    --secondary-color: #3f37c9;
+    --accent-color: #4895ef;
+    --success-color: #4cc9f0;
+    --warning-color: #f72585;
+    --text-color: #2b2d42;
+    --text-light: #8d99ae;
+    --bg-color: #f8f9fa;
+    --border-color: #e9ecef;
+    --border-radius: 8px;
+    --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    --transition: all 0.3s ease;
+}
+
+.specialist-profile-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--text-color);
+}
+
+/* Profile Header */
+.profile-header {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 2rem;
+    margin-bottom: 3rem;
+    background: white;
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+}
+
+.profile-avatar {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    overflow: hidden;
+    border: 4px solid white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.profile-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.verification-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--success-color);
+    color: white;
+    padding: 0.25rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.profile-info {
+    flex: 1;
+    min-width: 300px;
+}
+
+.profile-info h1 {
+    margin: 0 0 0.5rem 0;
+    font-size: 2rem;
+    color: var(--text-color);
+}
+
+.specialty-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: var(--primary-light);
+    color: var(--primary-color);
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+.rating-container {
+    margin-bottom: 1rem;
+}
+
+.stars {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.stars .fa-star {
+    color: #ddd;
+    font-size: 1rem;
+}
+
+.stars .filled {
+    color: #ffc107;
+}
+
+.stars span {
+    margin-left: 0.5rem;
+    color: var(--text-light);
+    font-size: 0.9rem;
+}
+
+.profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    margin-top: 1rem;
+}
+
+.meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.9rem;
+}
+
+.meta-item i {
+    color: var(--primary-color);
+}
+
+.action-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-width: 200px;
+}
+
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.primary-btn {
+    background: var(--primary-color);
+    color: white;
+}
+
+.primary-btn:hover {
+    background: var(--secondary-color);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+}
+
+.secondary-btn {
+    background: white;
+    color: var(--primary-color);
+    border: 1px solid var(--primary-color);
+}
+
+.secondary-btn:hover {
+    background: var(--primary-light);
+}
+
+/* Profile Content Layout */
+.profile-content {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 3rem;
+}
+
+.left-column {
+    flex: 2;
+}
+
+.right-column {
+    flex: 1;
+}
+
+/* Sections */
+.profile-section {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.profile-section h2 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-color);
+}
+
+.section-content {
+    line-height: 1.6;
+}
+
+.qualification-item, .experience-item {
+    margin-bottom: 1.5rem;
+}
+
+.qualification-item h3, .experience-item h3 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1.1rem;
+}
+
+.date {
+    color: var(--text-light);
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Contact Card */
+.contact-card, .availability-card {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+}
+
+.contact-card h3, .availability-card h3 {
+    margin: 0 0 1.5rem 0;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--primary-color);
+}
+
+.contact-item {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: flex-start;
+}
+
+.contact-item i {
+    color: var(--primary-color);
+    margin-top: 3px;
+}
+
+.contact-item strong {
+    display: block;
+    margin-bottom: 0.25rem;
+    font-size: 0.9rem;
+}
+
+.contact-item p {
+    margin: 0;
+    font-size: 0.9rem;
+    color: var(--text-color);
+}
+
+.contact-item a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.contact-item a:hover {
+    text-decoration: underline;
+}
+
+/* Availability */
+.availability-calendar {
+    margin-bottom: 1.5rem;
+}
+
+.calendar-placeholder {
+    background: var(--bg-color);
+    padding: 1rem;
+    border-radius: var(--border-radius);
+}
+
+.calendar-placeholder p {
+    margin: 0.5rem 0;
+}
+
+.full-width-btn {
+    width: 100%;
+}
+
+/* Reviews Section */
+.reviews-section {
+    background: white;
+    border-radius: var(--border-radius);
+    box-shadow: var(--box-shadow);
+    padding: 2rem;
+}
+
+.reviews-section h2 {
+    margin: 0 0 2rem 0;
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.reviews-summary {
+    display: flex;
+    gap: 3rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+}
+
+.overall-rating {
+    text-align: center;
+    min-width: 150px;
+}
+
+.rating-number {
+    font-size: 3rem;
+    font-weight: 700;
+    display: block;
+    line-height: 1;
+    margin-bottom: 0.5rem;
+    color: var(--text-color);
+}
+
+.rating-bars {
+    flex: 1;
+    min-width: 250px;
+}
+
+.rating-bar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+}
+
+.rating-bar span {
+    min-width: 50px;
+    font-size: 0.9rem;
+}
+
+.bar-container {
+    flex: 1;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.bar {
+    height: 100%;
+    background: var(--primary-color);
+    border-radius: 4px;
+}
+
+.count {
+    min-width: 30px;
+    text-align: right;
+    font-size: 0.9rem;
+    color: var(--text-light);
+}
+
+/* Review Cards */
+.reviews-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.review-card {
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 1.5rem;
+}
+
+.reviewer-info {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+    align-items: center;
+}
+
+.reviewer-avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.reviewer-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.initials-avatar {
+    width: 100%;
+    height: 100%;
+    background: var(--primary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+}
+
+.reviewer-meta h4 {
+    margin: 0 0 0.25rem 0;
+    font-size: 1rem;
+}
+
+.review-rating {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.review-rating .fa-star {
+    font-size: 0.9rem;
+    color: #ddd;
+}
+
+.review-rating .filled {
+    color: #ffc107;
+}
+
+.review-date {
+    margin-left: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--text-light);
+}
+
+.review-content h5 {
+    margin: 0 0 0.5rem 0;
+    font-size: 1.1rem;
+}
+
+.review-content p {
+    margin: 0;
+    line-height: 1.6;
+}
+
+.no-reviews {
+    text-align: center;
+    padding: 2rem;
+    color: var(--text-light);
+}
+
+.no-reviews i {
+    font-size: 2rem;
+    margin-bottom: 1rem;
+    color: var(--border-color);
+}
+
+.view-all-reviews {
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .profile-content {
+        flex-direction: column;
+    }
+    
+    .profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    .profile-info {
+        text-align: center;
+    }
+    
+    .profile-meta {
+        justify-content: center;
+    }
+    
+    .action-buttons {
+        flex-direction: row;
+        justify-content: center;
+    }
+    
+    .reviews-summary {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+}
+</style>
+
+{% endblock content %}

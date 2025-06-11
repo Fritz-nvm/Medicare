@@ -11,122 +11,13 @@
           <h4>Join Our Specialist Network</h4>
           <h6 class="font-weight-light">Complete your professional profile</h6>
 
-          <form class="pt-3" method="post" action="{% url 'core_app:specialist_signup' %}" novalidate>
-            {% csrf_token %}
-            
-            <!-- Error Display -->
-            {% if form.non_field_errors %}
-              <div class="alert alert-danger">
-                {% for error in form.non_field_errors %}
-                  {{ error }}
-                {% endfor %}
-              </div>
-            {% endif %}
-
-            <!-- Personal Information -->
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="first_name">First Name*</label>
-                <input type="text" name="first_name" class="form-control" 
-                       value="{{ form.first_name.value|default:'' }}" required>
-                {% if form.first_name.errors %}
-                  <small class="text-danger">{{ form.first_name.errors.0 }}</small>
-                {% endif %}
-              </div>
-              
-              <div class="form-group col-md-6">
-                <label for="last_name">Last Name*</label>
-                <input type="text" name="last_name" class="form-control" 
-                       value="{{ form.last_name.value|default:'' }}" required>
-                {% if form.last_name.errors %}
-                  <small class="text-danger">{{ form.last_name.errors.0 }}</small>
-                {% endif %}
-              </div>
-            </div>
-
-            <!-- Contact Information -->
-            <div class="form-group">
-              <label for="email">Email*</label>
-              <input type="email" name="email" class="form-control" 
-                     value="{{ form.email.value|default:'' }}" required>
-              {% if form.email.errors %}
-                <small class="text-danger">{{ form.email.errors.0 }}</small>
-              {% endif %}
-            </div>
-
-            <div class="form-group">
-              <label for="phone_number">Phone Number*</label>
-              <input type="tel" name="phone_number" class="form-control" 
-                     value="{{ form.phone_number.value|default:'' }}" required>
-              {% if form.phone_number.errors %}
-                <small class="text-danger">{{ form.phone_number.errors.0 }}</small>
-              {% endif %}
-            </div>
-
-            <!-- Password Fields -->
-            <div class="form-row">
-              <div class="form-group col-md-6">
-                <label for="password1">Password*</label>
-                <input type="password" name="password1" class="form-control" 
-                       pattern="(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{8,}" 
-                       title="Must contain: 8+ chars, 1 uppercase, 1 lowercase, 1 number" required>
-                <small class="form-text text-muted">8+ characters with mix of letters and numbers</small>
-              </div>
-              
-              <div class="form-group col-md-6">
-                <label for="password2">Confirm Password*</label>
-                <input type="password" name="password2" class="form-control" required>
-                {% if form.password2.errors %}
-                  <small class="text-danger">{{ form.password2.errors.0 }}</small>
-                {% endif %}
-              </div>
-            </div>
-
-            <!-- Professional Details -->
-            <div class="form-group">
-              <label for="specialty">Primary Specialty*</label>
-              <select name="specialty" class="form-control" required>
-                <option value="">Select your specialty</option>
-                {% for specialty in specialties %}
-                  <option value="{{ specialty.id }}" 
-                    {% if form.specialty.value == specialty.id %}selected{% endif %}>
-                    {{ specialty.name }}
-                  </option>
-                {% endfor %}
-              </select>
-            </div>
-
-            <div class="form-group">
-              <label for="qualifications">Qualifications*</label>
-              <textarea name="qualifications" class="form-control" rows="3" required>{{ form.qualifications.value|default:'' }}</textarea>
-              {% if form.qualifications.errors %}
-                <small class="text-danger">{{ form.qualifications.errors.0 }}</small>
-              {% endif %}
-            </div>
-
-            <div class="form-group">
-              <label for="experience_years">Years of Experience*</label>
-              <input type="number" name="experience_years" class="form-control" 
-                     min="0" max="50" value="{{ form.experience_years.value|default:'' }}" required>
-            </div>
-
-            <!-- Terms and Submission -->
-            <div class="form-group">
-              <div class="form-check">
-                <input class="form-check-input" type="checkbox" id="terms" required>
-                <label class="form-check-label" for="terms">
-                  I agree to the <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a>
-                </label>
-              </div>
-            </div>
-
-            <button type="submit" class="btn btn-primary btn-block btn-lg mt-4">
-              Complete Registration
-            </button>
-
-            <div class="text-center mt-3">
-              Already registered? <a href="{% url 'login' %}">Sign In</a>
-            </div>
+          <form method="post">
+           {% csrf_token %}
+  
+             <!-- Render the entire form -->
+             {{ form.as_p }}
+  
+              <button type="submit">sign up</button>
           </form>
         </div>
       </div>

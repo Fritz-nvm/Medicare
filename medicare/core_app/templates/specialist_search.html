@@ -1,260 +1,510 @@
 {% extends "dashboard.html" %}
+{% load static %}
 
 {% block title %}Search Specialists - Medicare{% endblock %}
 
 {% block content %}
 <div class="search-container">
-    <h1>Find a Specialist</h1>
+    <div class="search-header">
+        <h1 class="search-title">Find Your Specialist</h1>
+        
+        <p class="search-subtitle">Search by specialty or name</p>
+    </div>
     
     <div class="search-form">
-        <form method="get" action="{% url 'specialist_search' %}">
-            <div class="form-group">
-                <label for="id_specialty">Specialty:</label>
-                {{ form.specialty }}
-                <small class="form-text">Search by specialty</small>
-
+        <form method="get" action="{% url 'specialist_search' %}" class="elegant-search-form">
+            <div class="form-grid">
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-stethoscope"></i>
+                        {{ form.specialty }}
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <div class="input-with-icon">
+                        <i class="fas fa-user"></i>
+                        {{ form.name }}
+                    </div>
+                </div>
+                
+                <button type="submit" class="btn search-btn">
+                    <i class="fas fa-search"></i> Search
+                </button>
             </div>
-            
-            <div class="form-group">
-                <label for="id_name">Name:</label>
-                {{ form.name }}
-                <small class="form-text">Search by first or last name</small>
-            </div>
-            
-            <button type="submit" class="btn search-btn">Search</button>
         </form>
     </div>
     
     <div class="search-results">
-        <h2>Search Results</h2>
+        <div class="results-header">
+            <h2>Available Specialists</h2>
+            
+            {% if specialists %}
+                <div class="results-meta">
+                    <span class="results-count">{{ page_obj.paginator.count }} specialist{{ page_obj.paginator.count|pluralize }} available</span>
+                </div>
+            {% endif %}
+        </div>
         
         {% if specialists %}
-            <div class="results-count">
-                <p>Found {{ page_obj.paginator.count }} specialist{{ page_obj.paginator.count|pluralize }}</p>
-            </div>
-            
-            <div class="specialists-list">
+            <div class="specialists-grid">
                 {% for specialist in specialists %}
                     <div class="specialist-card">
-                        <div class="specialist-info">
-                            <h3>{{ specialist.get_full_name }}</h3>
-                            <p class="specialty">
-                                {% if specialist.specialist_profile.specialty %}
-                                    {{ specialist.specialist_profile.specialty.name }}
-                                {% else %}
-                                    Specialty not specified
-                                {% endif %}
-                            </p>
-                            
-                            {% if specialist.specialist_profile.experience_years %}
-                                <p class="experience">{{ specialist.specialist_profile.experience_years }} years of experience</p>
-                            {% endif %}
-                            
-                            {% if specialist.specialist_profile.qualifications %}
-                                <div class="qualifications">
-                                    <h4>Qualifications</h4>
-                                    <p>{{ specialist.specialist_profile.qualifications }}</p>
+                        <div class="card-header">
+                            <div class="avatar-container">
+                                <img src="{% static 'images\default-avatar.jpg' %}" alt="{{ specialist.get_full_name }}" class="profile-avatar">
+                                <div class="online-status"></div>
+                            </div>
+                            <div class="specialist-info">
+                                <h3>{{ specialist.get_full_name }}</h3>
+                                <div class="specialty-badge">
+                                    <i class="fas fa-user-md"></i>
+                                    {{ specialist.specialist_profile.specialty.name|default:"General Practitioner" }}
                                 </div>
-                            {% endif %}
+                            </div>
                         </div>
                         
-                        <div class="specialist-actions">
-                            <a href="#" class="btn view-profile-btn">View Profile</a>
-                            <a href="{% url 'compose_to_specialist' specialist.id %}" class="btn message-btn">Send Message</a>
+                        <div class="card-body">
+                            <div class="detail-row">
+                                <i class="fas fa-hospital"></i>
+                                <span>{{ specialist.specialist_profile.hospital.name|default:"Private Practice" }}</span>
+                            </div>
+                            
+                            <div class="detail-row">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>{{ specialist.specialist_profile.location|default:"Location not specified" }}</span>
+                            </div>
+                            
+                            <div class="stats-row">
+                                <div class="stat-item">
+                                    <i class="fas fa-briefcase"></i>
+                                    <span>{{ specialist.specialist_profile.experience_years|default:"0" }} yrs</span>
+                                </div>
+                                <div class="stat-item">
+                                    <i class="fas fa-star"></i>
+                                    <span>4.8</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card-footer">
+                            <a href="{% url 'core_app:specialist_information' %}" class="action-btn profile-btn">
+                                <i class="fas fa-user-circle"></i> Profile
+                            </a>
+                            <a href="{% url 'compose_to_specialist' specialist.id %}" class="action-btn primary-btn">
+                                <i class="fas fa-envelope"></i> Message
+                            </a>
                         </div>
                     </div>
                 {% endfor %}
             </div>
             
             {% if is_paginated %}
-                <div class="pagination">
-                    <span class="step-links">
+                <div class="pagination-container">
+                    <div class="pagination">
                         {% if page_obj.has_previous %}
-                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1">&laquo; first</a>
-                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}">previous</a>
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page=1" class="page-link">
+                                <i class="fas fa-angle-double-left"></i>
+                            </a>
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.previous_page_number }}" class="page-link">
+                                <i class="fas fa-angle-left"></i>
+                            </a>
                         {% endif %}
                         
-                        <span class="current">
-                            Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}
-                        </span>
+                        {% for num in page_obj.paginator.page_range %}
+                            {% if page_obj.number == num %}
+                                <span class="page-link active">{{ num }}</span>
+                            {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+                                <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ num }}" class="page-link">
+                                    {{ num }}
+                                </a>
+                            {% endif %}
+                        {% endfor %}
                         
                         {% if page_obj.has_next %}
-                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}">next</a>
-                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}">last &raquo;</a>
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.next_page_number }}" class="page-link">
+                                <i class="fas fa-angle-right"></i>
+                            </a>
+                            <a href="?{% for key, value in request.GET.items %}{% if key != 'page' %}{{ key }}={{ value }}&{% endif %}{% endfor %}page={{ page_obj.paginator.num_pages }}" class="page-link">
+                                <i class="fas fa-angle-double-right"></i>
+                            </a>
                         {% endif %}
-                    </span>
+                    </div>
                 </div>
             {% endif %}
         {% else %}
-            <div class="no-results">
-                <p>No specialists found matching your criteria.</p>
-                <p>Try broadening your search or selecting a different specialty.</p>
+            <div class="empty-state">
+                <div class="empty-icon">
+                    <i class="fas fa-search fa-3x"></i>
+                </div>
+                <h3>No specialists found</h3>
+                <p>Try adjusting your search criteria</p>
             </div>
         {% endif %}
     </div>
 </div>
 
 <style>
+    /* Base Styles */
+    :root {
+        --primary-color: #4361ee;
+        --secondary-color: #3f37c9;
+        --accent-color: #4895ef;
+        --light-color: #f8f9fa;
+        --dark-color: #212529;
+        --success-color: #4cc9f0;
+        --warning-color: #f72585;
+        --border-radius: 8px;
+        --box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        --transition: all 0.3s ease;
+    }
+    
     .search-container {
         max-width: 1200px;
         margin: 0 auto;
-        padding: 20px;
+        padding: 2rem 1rem;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     }
     
-    .search-form {
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 30px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    /* Search Header */
+    .search-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .search-title {
+        color: var(--dark-color);
+        font-size: 2.2rem;
+        margin-bottom: 0.5rem;
+        font-weight: 700;
+    }
+    
+    .search-subtitle {
+        color: #6c757d;
+        font-size: 1.1rem;
+    }
+    
+    /* Search Form */
+    .elegant-search-form {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--box-shadow);
+        margin-bottom: 2rem;
+    }
+    
+    .form-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1rem;
+        align-items: flex-end;
     }
     
     .form-group {
-        margin-bottom: 15px;
+        margin-bottom: 0;
     }
     
-    .form-group label {
-        display: block;
-        margin-bottom: 5px;
-        font-weight: bold;
+    .input-with-icon {
+        position: relative;
     }
     
-    .form-group input,
-    .form-group select {
+    .input-with-icon i {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--primary-color);
+    }
+    
+    .input-with-icon select,
+    .input-with-icon input {
         width: 100%;
-        padding: 8px;
-        border: 1px solid #ddd;
-        border-radius: 4px;
+        padding: 0.75rem 1rem 0.75rem 2.5rem;
+        border: 1px solid #e9ecef;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        transition: var(--transition);
+        background-color: #f8f9fa;
     }
     
-    .form-text {
-        color: #666;
-        font-size: 0.9em;
+    .input-with-icon select:focus,
+    .input-with-icon input:focus {
+        outline: none;
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(72, 149, 239, 0.2);
+        background-color: white;
     }
     
     .search-btn {
-        background-color: #4a69bd;
+        background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
         color: white;
-        padding: 10px 20px;
         border: none;
-        border-radius: 4px;
+        padding: 0.75rem 1.5rem;
+        border-radius: var(--border-radius);
+        font-size: 1rem;
+        font-weight: 600;
         cursor: pointer;
-        font-size: 1em;
+        transition: var(--transition);
+        height: auto;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
     }
     
     .search-btn:hover {
-        background-color: #3c5aa6;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.3);
+    }
+    
+    /* Results Header */
+    .results-header {
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 1px solid #e9ecef;
+    }
+    
+    .results-header h2 {
+        color: var(--dark-color);
+        font-size: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .results-meta {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
     }
     
     .results-count {
-        margin-bottom: 20px;
-        font-weight: bold;
+        color: var(--primary-color);
+        font-weight: 600;
+        background: rgba(67, 97, 238, 0.1);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+    }
+    
+    /* Specialist Cards */
+    .specialists-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
     }
     
     .specialist-card {
-        background-color: #fff;
-        border: 1px solid #eee;
-        border-radius: 8px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+        overflow: hidden;
+        transition: var(--transition);
+        border-top: 4px solid var(--primary-color);
     }
     
-    .specialist-info {
-        flex: 1;
+    .specialist-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    .card-header {
+        display: flex;
+        padding: 1.25rem;
+        border-bottom: 1px solid #f1f1f1;
+        align-items: center;
+    }
+    
+    .avatar-container {
+        position: relative;
+        margin-right: 1rem;
+    }
+    
+    .profile-avatar {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        object-fit: cover;
+        border: 3px solid white;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    }
+    
+    .online-status {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        width: 12px;
+        height: 12px;
+        background-color: #4ade80;
+        border-radius: 50%;
+        border: 2px solid white;
     }
     
     .specialist-info h3 {
-        margin-top: 0;
-        color: #333;
+        margin: 0 0 0.25rem 0;
+        color: var(--dark-color);
+        font-size: 1.1rem;
     }
     
-    .specialty {
-        color: #4a69bd;
-        font-weight: bold;
-        margin-bottom: 10px;
+    .specialty-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.25rem;
+        background: rgba(67, 97, 238, 0.1);
+        color: var(--primary-color);
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.85rem;
     }
     
-    .experience {
-        color: #666;
-        margin-bottom: 10px;
+    .card-body {
+        padding: 1rem 1.25rem;
     }
     
-    .qualifications {
-        margin-top: 15px;
-    }
-    
-    .qualifications h4 {
-        margin-bottom: 5px;
-        color: #555;
-    }
-    
-    .specialist-actions {
+    .detail-row {
         display: flex;
-        flex-direction: column;
-        gap: 10px;
-        margin-left: 20px;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        color: #495057;
+        font-size: 0.9rem;
     }
     
-    .view-profile-btn,
-    .message-btn {
-        display: inline-block;
-        padding: 8px 16px;
-        border-radius: 4px;
-        text-decoration: none;
+    .detail-row i {
+        margin-right: 0.5rem;
+        color: var(--accent-color);
+        width: 20px;
         text-align: center;
-        min-width: 120px;
     }
     
-    .view-profile-btn {
-        background-color: #f0f0f0;
-        color: #333;
+    .stats-row {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px dashed #e9ecef;
     }
     
-    .message-btn {
-        background-color: #4a69bd;
+    .stat-item {
+        display: flex;
+        align-items: center;
+        gap: 0.25rem;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .stat-item i {
+        color: var(--accent-color);
+    }
+    
+    .card-footer {
+        display: flex;
+        padding: 0.75rem 1.25rem;
+        border-top: 1px solid #f1f1f1;
+        background: #f8f9fa;
+    }
+    
+    .action-btn {
+        flex: 1;
+        padding: 0.5rem;
+        text-align: center;
+        font-size: 0.85rem;
+        border-radius: 4px;
+        margin: 0 0.25rem;
+        transition: var(--transition);
+        text-decoration: none;
+    }
+    
+    .profile-btn {
+        background: white;
+        color: #495057;
+        border: 1px solid #e9ecef;
+    }
+    
+    .profile-btn:hover {
+        background: #f1f3f5;
+    }
+    
+    .primary-btn {
+        background: var(--primary-color);
         color: white;
+        border: 1px solid var(--primary-color);
     }
     
-    .view-profile-btn:hover {
-        background-color: #e0e0e0;
+    .primary-btn:hover {
+        background: var(--secondary-color);
     }
     
-    .message-btn:hover {
-        background-color: #3c5aa6;
+    /* Pagination */
+    .pagination-container {
+        margin-top: 2rem;
     }
     
     .pagination {
-        margin-top: 30px;
-        text-align: center;
+        display: flex;
+        justify-content: center;
+        gap: 0.5rem;
     }
     
-    .pagination a {
-        display: inline-block;
-        padding: 5px 10px;
-        margin: 0 5px;
-        background-color: #f0f0f0;
-        border-radius: 4px;
+    .page-link {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: white;
+        color: #495057;
+        border: 1px solid #e9ecef;
         text-decoration: none;
-        color: #333;
+        transition: var(--transition);
     }
     
-    .pagination .current {
-        padding: 5px 10px;
-        margin: 0 5px;
-        background-color: #4a69bd;
+    .page-link:hover {
+        background: #f1f3f5;
+    }
+    
+    .page-link.active {
+        background: var(--primary-color);
         color: white;
-        border-radius: 4px;
+        border-color: var(--primary-color);
     }
     
-    .no-results {
-        background-color: #f9f9f9;
-        border-radius: 8px;
-        padding: 20px;
+    /* Empty State */
+    .empty-state {
         text-align: center;
+        padding: 3rem 1rem;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--box-shadow);
+    }
+    
+    .empty-icon {
+        color: var(--accent-color);
+        margin-bottom: 1rem;
+    }
+    
+    .empty-state h3 {
+        color: var(--dark-color);
+        margin-bottom: 0.5rem;
+    }
+    
+    .empty-state p {
+        color: #6c757d;
+        margin-bottom: 0;
+    }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 768px) {
+        .form-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .results-meta {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 0.5rem;
+        }
+        
+        .specialists-grid {
+            grid-template-columns: 1fr;
+        }
     }
 </style>
 {% endblock %}

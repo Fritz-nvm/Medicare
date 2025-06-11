@@ -28,7 +28,7 @@
           <span></span>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'core_app:dashboard' %}">
+          <a class="nav-link" href="{% url 'specialist_search' %}">
             <i class="mdi mdi-view-quilt menu-icon"></i>
             <span class="menu-title">Dashboard</span>
             <div class="badge badge-info badge-pill">2</div>
@@ -44,16 +44,20 @@
             <span class="menu-title">Messages</span>
           </a>
         </li>
+        {% if request.user == specialist %}
+
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'specialist_search' %}">
-            <i class="mdi mdi-view-headline menu-icon"></i>
-            <span class="menu-title">Specialists</span>
+          <a class="nav-link" href="{% url 'core_app:patients' %}">
+            <i class="mdi mdi-chart-pie menu-icon"></i>
+            <span class="menu-title">Your Patients</span>
           </a>
         </li>
+        {% endif %}
+
         <li class="nav-item">
-          <a class="nav-link" href="#">
+          <a class="nav-link" href="{% url 'core_app:profile' %}">
             <i class="mdi mdi-chart-pie menu-icon"></i>
-            <span class="menu-title">Health Records</span>
+            <span class="menu-title">Your Profile</span>
           </a>
         </li>
 
@@ -76,7 +80,7 @@
             <span class="mdi mdi-menu"></span>
           </button>
           <div class="navbar-brand-wrapper">
-            <a class="navbar-brand brand-logo" href="#"><img src="{% static 'images/logo.svg' %}" alt="logo"/></a>
+            <!-- <a class="navbar-brand brand-logo" href="#"><img src="{% static 'images/logo.svg' %}" alt="logo"/></a> -->
           </div>
           <h4 class="font-weight-bold mb-0 d-none d-md-block mt-1">Welcome back, {{ user.get_full_name|default:user.username }}</h4>
           <ul class="navbar-nav navbar-nav-right">
