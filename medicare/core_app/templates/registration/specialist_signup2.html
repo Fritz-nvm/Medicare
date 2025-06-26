@@ -1,0 +1,27 @@
+{% extends "registration/base_auth.html" %}
+{% load static %}
+{% block title %}Specialist Registration{% endblock title %}
+
+{% block content %}
+<div class="container-fluid page-body-wrapper full-page-wrapper d-flex">
+  <div class="content-wrapper d-flex align-items-center auth px-0">
+    <div class="row w-100 mx-0">
+      <div class="col-lg-4 mx-auto">
+        <div class="auth-form-light text-left py-5 px-4 px-sm-5">
+          <h4>Join Our Specialist Network</h4>
+          <h6 class="font-weight-light">Complete your professional profile</h6>
+
+          <form method="post">
+           {% csrf_token %}
+  
+             <!-- Render the entire form -->
+             {{ form.as_p }}
+  
+              <button type="submit">sign up</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
